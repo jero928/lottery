@@ -132,6 +132,11 @@ def run(root=ROOT,fetch=None,clock=None):
         results=settle(ledger,pubs,rows,read(root/'archive/settlements.json',[]))
         added=len(rows)-len(old)
         health=dict(state='ok',checkedAt=clock.isoformat(),lastSuccessAt=clock.isoformat(),lastNewDrawAt=clock.isoformat() if added else previous.get('lastNewDrawAt'),latestPeriod=rows[-1]['period'],latestDate=rows[-1]['date'],newDraws=added,message='新獎號及預測已更新' if added else '官方尚無新一期，保留既有資料與預測')
+        due=dt.datetime.fromisoformat(date+'T20:30:00+08:00')
+        health['awaitingOfficial']=clock>=due
+        health['expectedPeriod']=period
+        if health['awaitingOfficial']:
+            health['message']='已到預定開獎時間，官方歷史查詢尚未提供下一期資料；保留上一期，等待再次同步'
         data=build_bundle(rows,model,ledger,pubs,results,health)
         write(root/'archive/history.json',rows);write(root/'archive/model.json',model);write(root/'archive/predictions.json',ledger);write(root/'archive/settlements.json',results)
         save_public(root,data,health)

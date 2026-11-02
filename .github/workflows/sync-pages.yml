@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '7,37 * * * *'
+    # Additional checks during 20:00-23:59 Asia/Taipei. GitHub may delay runs.
+    - cron: '3,13,23,33,43,53 12-15 * * *'
 permissions:
   contents: write
   pages: write
