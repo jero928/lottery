@@ -27,6 +27,8 @@ def validate(rows,today=None):
         if period in periods:
             old=periods[period]
             if old['date']!=r['date'] or old['numbers']!=r['numbers']:raise ValueError('Conflicting duplicate period '+period)
+            if old.get('verificationStatus')=='user_provided_pending_official' and r.get('rawSha256'):
+                old.update(verificationStatus='official_confirmed',source=r['source'],updatedAt=r['updatedAt'],rawSha256=r['rawSha256'])
             for field in ('source','updatedAt','rawSha256'):
                 if field not in old and field in r:old[field]=r[field]
             continue
@@ -137,6 +139,9 @@ def run(root=ROOT,fetch=None,clock=None):
         health['expectedPeriod']=period
         if health['awaitingOfficial']:
             health['message']='已到預定開獎時間，官方歷史查詢尚未提供下一期資料；保留上一期，等待再次同步'
+        if rows[-1].get('verificationStatus')=='user_provided_pending_official':
+            health['awaitingOfficial']=True
+            health['message']='最新一期依使用者提供號碼更新，尚待官方歷史 API 核對；預測及命中統計暫依此資料計算'
         data=build_bundle(rows,model,ledger,pubs,results,health)
         write(root/'archive/history.json',rows);write(root/'archive/model.json',model);write(root/'archive/predictions.json',ledger);write(root/'archive/settlements.json',results)
         save_public(root,data,health)

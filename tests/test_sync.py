@@ -38,6 +38,16 @@ class SyncTests(unittest.TestCase):
         self.assertEqual(settle(ledger,pubs,[actual],results),results)
         self.assertEqual(ledger,original)
 
+    def test_manual_draw_official_reconciliation(self):
+        manual=dict(self.rows[-1],verificationStatus='user_provided_pending_official')
+        official=dict(manual,source='official',rawSha256='test-hash',updatedAt='test')
+        official.pop('verificationStatus')
+        merged=validate([manual,official])
+        self.assertEqual(merged[0]['verificationStatus'],'official_confirmed')
+        self.assertEqual(merged[0]['source'],'official')
+        official['numbers']=[1,2,3,4,6]
+        with self.assertRaises(ValueError):validate([manual,official])
+
     def test_validation_and_preservation(self):
         r=copy.deepcopy(self.rows[:5]);self.assertEqual(len(validate(r+[r[0]])),5)
         bad=copy.deepcopy(r[0]);bad['numbers']=[1,1,2,3,4]
@@ -52,21 +62,22 @@ class SyncTests(unittest.TestCase):
     def test_half_year_boundary_and_fetch_scope(self):
         from urllib.parse import urlparse,parse_qs
         clock=dt.datetime(2026,11,1,9,tzinfo=TZ)
+        rows=[r for r in self.rows if r["date"]<=clock.date().isoformat()]
         cutoff=clock.date()-dt.timedelta(days=179)
-        chosen=analysis_window(self.rows,clock)
+        chosen=analysis_window(rows,clock)
         self.assertTrue(chosen)
         self.assertTrue(all(cutoff.isoformat()<=r['date']<='2026-11-01' for r in chosen))
-        self.assertLess(len(chosen),len(self.rows))
+        self.assertLess(len(chosen),len(rows))
         requested=[]
         def fixture(url):
             month=parse_qs(urlparse(url).query)['month'][0];requested.append(month)
-            rr=[dict(lotteryDate=r['date'],period=r['period'],drawNumberSize=r['numbers']) for r in self.rows if r['date'].startswith(month)]
+            rr=[dict(lotteryDate=r['date'],period=r['period'],drawNumberSize=r['numbers']) for r in rows if r['date'].startswith(month)]
             return json.dumps(dict(rtCode=0,content=dict(totalSize=len(rr),daily539Res=rr))).encode()
         with tempfile.TemporaryDirectory() as tmp:
-            merged=fetch_official(Path(tmp),self.rows,clock,fixture)
+            merged=fetch_official(Path(tmp),rows,clock,fixture)
         self.assertEqual(requested[0],cutoff.isoformat()[:7])
         self.assertEqual(requested[-1],'2026-11')
-        self.assertEqual(len(merged),len(self.rows),'Archived older draws must not be deleted')
+        self.assertEqual(len(merged),len(rows),'Archived older draws must not be deleted')
 
     def test_no_future_leakage(self):
         rows=copy.deepcopy(self.rows[:70]);x,y=features(rows);a=forecast(x,y,60)
