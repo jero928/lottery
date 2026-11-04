@@ -24,9 +24,9 @@ function tick(){window.updatePredictionStatus?.();const now=new Date(),day=dateT
 document.querySelectorAll('[data-days]').forEach(b=>b.onclick=()=>{days=Number(b.dataset.days);historyPage=1;document.querySelectorAll('[data-days]').forEach(x=>x.classList.toggle('selected',x===b));render();});
 
 let fetchedAt=window.LOTTERY_DATA.fetchedAt;
-function status(message='') {const age=(Date.now()-Date.parse(fetchedAt))/3600000; $('status').textContent=(location.protocol==='file:'?'':'已發布資料 · ')+'官方資料取得時間：'+new Date(fetchedAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})+(age>2?' · 超過2小時未更新，請檢查 GitHub Actions':'')+(message?' · '+message:'');}
+function status(message='') {const age=(Date.now()-Date.parse(fetchedAt))/3600000; $('status').textContent=(location.protocol==='file:'?'':'已發布資料 · ')+'官方資料取得時間：'+new Date(fetchedAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'})+(message?' · '+message:'');}
 
-function health(s){const stale=Date.now()-Date.parse(s.checkedAt)>60*60*1000;const label=s.state!=='ok'?'同步異常':stale?'排程延遲':s.awaitingOfficial?'等待官方資料':'同步正常';$('sync-health').textContent=`${label} · ${s.message} · 最後成功檢查：${s.lastSuccessAt?new Date(s.lastSuccessAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'尚未成功'}${stale?' · 超過1小時未檢查，GitHub 排程可能延遲':''}`;$('sync-health').classList.toggle('warn',s.state!=='ok'||stale||s.awaitingOfficial);}
+function health(s){const stale=Date.now()-Date.parse(s.checkedAt)>60*60*1000;const label=s.state!=='ok'?'同步異常':stale?'排程延遲':s.awaitingOfficial?'等待官方資料':'同步正常';$('sync-health').textContent=`${label} · ${s.message} · 最後成功檢查：${s.lastSuccessAt?new Date(s.lastSuccessAt).toLocaleString('zh-TW',{timeZone:'Asia/Taipei'}):'尚未成功'}`;$('sync-health').classList.toggle('warn',s.state!=='ok'||stale||s.awaitingOfficial);}
 function valid(d){
  if(d?.schemaVersion!==3||!Array.isArray(d.draws)||!d.draws.length||!d.ai||d.ai.rule!=='any-selected-tail-v1'||!Number.isFinite(Date.parse(d.fetchedAt)))return false;
  const ids=new Set();
