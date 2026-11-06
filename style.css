@@ -121,10 +121,6 @@ footer{font-size:14px;line-height:1.8}
 }
 @media(max-width:360px){h1{font-size:28px}}
 
-.pick-comparison{background:#fff7df;color:#234131;border:2px solid #e6c16b;border-radius:12px;padding:18px 22px;line-height:1.5}
 .pick-comparison:empty{display:none}
-.pick-comparison h3{color:#36533e;font-size:17px}
-.pick-lead{font-weight:700;margin:4px 0}
-.pick-lead strong{font:700 clamp(48px,8vw,72px)/1.12 'Space Grotesk',sans-serif}
-.pick-comparison p{font-size:15px;color:#394f3f;line-height:1.6}
-.pick-comparison .pick-gap{margin-top:6px;font-weight:700}
+.comparison-card{margin-top:18px}
+@media(max-width:760px){.comparison-card{flex-direction:row;flex-wrap:wrap;text-align:left;justify-content:flex-start}}

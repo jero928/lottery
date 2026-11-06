@@ -29,10 +29,12 @@ window.renderTailAI=()=>{
    const [higher, lower] = a >= b ? [first, second] : [second, first];
    const gap = Math.abs(a - b) * 100;
    const difference = gap === 0 ? '相差 0 個百分點' : gap < 0.0005 ? '相差不到 0.001 個百分點' : '相差約 ' + gap.toFixed(3) + ' 個百分點';
-   panel.innerHTML = `<h3>${tied ? '單尾機率並列最高' : '較高機率尾數'}</h3>
-     <div class="pick-lead"><strong>${tied ? higher + '、' + lower : higher}</strong> 尾</div>
-     <p>模型估計 · ${higher} 尾 ${(p.probabilities[higher]*100).toFixed(4)}% ／ ${lower} 尾 ${(p.probabilities[lower]*100).toFixed(4)}%</p>
-     <p class="pick-gap">${difference}</p>`;
+   panel.innerHTML = `<div class="focus-heading"><h2>${tied ? '單尾機率並列最高' : '較高機率尾數'}</h2></div>
+     <div class="focus-pick comparison-card">
+       <div class="focus-number"><strong>${tied ? higher + '、' + lower : higher}</strong><span>尾</span></div>
+       <div><b>單尾模型估計 ${(p.probabilities[higher]*100).toFixed(4)}%</b>
+       <p>${lower} 尾 ${(p.probabilities[lower]*100).toFixed(4)}% · ${difference}</p></div>
+     </div>`;
  }
  }
  el('ai-validation').innerHTML=`<div class="accuracy-grid"><div><span>命中率</span><b>${pct(s.rate)}</b><p>成功${s.hits}期／已結算${s.settled}期</p></div><div><span>實際發布總期數</span><b>${s.totalPredictions}</b><p>待開獎${s.pending}期 · 逾時排除${s.excluded}期</p></div><div><span>任一尾命中理論值</span><b>${pct(p?.baseline)}</b><p>按0尾3個、其他尾4個號碼計算</p></div></div>`;
