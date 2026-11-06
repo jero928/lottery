@@ -20,7 +20,19 @@ window.renderTailAI=()=>{
  const p=current.prediction,s=current.liveSummary;
  if(p){el('ai-scope').textContent=`第${p.period}期 · 預定${p.targetDate} · ${p.windowDays?"近"+p.windowDays+"天 · ":""}使用${p.historyCount}期資料`;
  el('ai-tails').innerHTML=p.tails.map(t=>`<div class="focus-pick"><div class="focus-number"><strong>${t}</strong><span>尾</span></div><div><b>單尾模型估計 ${pct(p.probabilities[t])}</b><p>對應號碼 ${Array.from({length:39},(_,i)=>i+1).filter(n=>n%10===t).map(n=>String(n).padStart(2,'0')).join('、')}</p></div></div>`).join('');
- el('ai-note').textContent='';}
+ const [first, second] = p.tails;
+ const a = p.probabilities[first], b = p.probabilities[second];
+ const note = el('ai-note');
+ note.textContent = '';
+ if (Number.isFinite(a) && Number.isFinite(b)) {
+   const emphasis = document.createElement('strong');
+   const best = a > b ? first : second;
+   emphasis.textContent = a === b
+     ? `單尾機率並列最高：${first} 尾、${second} 尾（各 ${pct(a)}）`
+     : `較高機率尾數：${best} 尾（模型估計 ${pct(Math.max(a, b))}）`;
+   note.append(emphasis);
+ }
+ }
  el('ai-validation').innerHTML=`<div class="accuracy-grid"><div><span>命中率</span><b>${pct(s.rate)}</b><p>成功${s.hits}期／已結算${s.settled}期</p></div><div><span>實際發布總期數</span><b>${s.totalPredictions}</b><p>待開獎${s.pending}期 · 逾時排除${s.excluded}期</p></div><div><span>任一尾命中理論值</span><b>${pct(p?.baseline)}</b><p>按0尾3個、其他尾4個號碼計算</p></div></div>`;
  const bt=current.backtest,h=bt.filter(r=>r.hit).length,base=bt.reduce((n,r)=>n+r.baseline,0)/Math.max(1,bt.length);
  el('backtest-summary').textContent=`歷史模擬（獨立列示）：最近${bt.length}期命中 ${h}期（${bt.length?pct(h/bt.length):'—'}），同條件理論基準 ${pct(base)}。此數據不是實際發布成績。`;
