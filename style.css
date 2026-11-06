@@ -121,6 +121,14 @@ footer{font-size:14px;line-height:1.8}
 }
 @media(max-width:360px){h1{font-size:28px}}
 
+
+.pick-comparison{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;padding:12px 18px;margin:0 0 22px;background:#edf4ed;color:#214836;border:1px solid #d6e4d8;border-inline-start:4px solid #367250;border-radius:9px}
 .pick-comparison:empty{display:none}
-.comparison-card{margin-top:18px}
-@media(max-width:760px){.comparison-card{flex-direction:row;flex-wrap:wrap;text-align:left;justify-content:flex-start}}
+.pick-choice,.pick-estimates{display:flex;align-items:center;gap:10px}
+.pick-choice h2{font-size:15px;margin:0}
+.pick-choice strong{font:700 26px/1.2 'Space Grotesk',sans-serif;color:#155237}
+.pick-choice small{font-size:13px;margin-left:3px}
+.pick-estimates{font-size:13px;flex-wrap:wrap;gap:4px 8px;font-variant-numeric:tabular-nums}
+.pick-estimates span{color:#506959}
+.pick-difference{font-size:14px;font-weight:600}
+@media(max-width:640px){.pick-comparison{padding:10px 14px;gap:4px 16px}.pick-estimates{order:1;width:100%}.pick-difference{font-size:13px}}
