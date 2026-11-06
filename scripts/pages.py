@@ -37,16 +37,9 @@ def verify(url):
     raise TimeoutError('Public Pages snapshot did not match; do not confirm a prediction')
 
 def legacy(url):
-    expected=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     api('pages/builds','POST')
-    deadline=time.monotonic()+600
-    while time.monotonic()<deadline:
-        build=api('pages/builds/latest')
-        if build.get('commit')==expected:
-            if build['status']=='built':verify(url);return
-            if build['status']=='errored':raise RuntimeError('Pages build failed: '+str(build.get('error')))
-        time.sleep(10)
-    raise TimeoutError('Pages build was not confirmed')
+    # Concurrent Pages builds may cancel one another. Confirm the exact live snapshot.
+    verify(url)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('command',choices=['inspect','legacy','verify']);p.add_argument('--url');args=p.parse_args()
